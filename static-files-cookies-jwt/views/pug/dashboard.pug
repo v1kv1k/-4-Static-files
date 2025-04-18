@@ -1,0 +1,89 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= title
+    link(rel="icon", href="/favicon.ico")
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #{theme === 'dark' ? '#222' : theme === 'blue' ? '#e6f2ff' : theme === 'green' ? '#e6fff2' : '#fff'};
+        color: #{theme === 'dark' ? '#fff' : '#333'};
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .user-info {
+        background-color: #{theme === 'dark' ? '#333' : '#f0f0f0'};
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .data-section {
+        margin-top: 20px;
+      }
+      .buttons {
+        margin-top: 20px;
+      }
+      button {
+        padding: 8px 16px;
+        margin-right: 10px;
+      }
+  body
+    .container
+      h1= title
+      p Welcome to your dashboard! This is a protected page.
+      
+      .user-info
+        h3 User Information
+        p Username: #{user.username}
+      
+      .data-section
+        h3 Your Data
+        button#fetch-data Fetch Data
+        div#data-container
+      
+      .buttons
+        button#profile-btn View Profile
+        button#home-btn Back to Home
+        button#logout-btn Logout
+
+      script.
+        document.getElementById('fetch-data').addEventListener('click', () => {
+          fetch('/protected/data')
+            .then(response => response.json())
+            .then(data => {
+              const container = document.getElementById('data-container');
+              container.innerHTML = '<ul>' + 
+                data.data.map(item => `<li>${item.id}: ${item.name}</li>`).join('') +
+                '</ul>';
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error fetching data. You might need to log in again.');
+            });
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          fetch('/auth/logout', {
+            method: 'POST',
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message);
+            window.location.href = '/';
+          })
+          .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('home-btn').addEventListener('click', () => {
+          window.location.href = '/';
+        });
+
+        document.getElementById('profile-btn').addEventListener('click', () => {
+          window.location.href = '/protected/profile';
+        }); 

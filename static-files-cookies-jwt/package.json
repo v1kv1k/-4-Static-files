@@ -1,0 +1,26 @@
+{
+  "name": "static-files-cookies-jwt",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Express server with static files, cookies, and JWT authentication",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

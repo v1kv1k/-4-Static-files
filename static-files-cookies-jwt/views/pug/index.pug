@@ -1,0 +1,111 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= title
+    link(rel="icon", href="/favicon.ico")
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #{theme === 'dark' ? '#222' : theme === 'blue' ? '#e6f2ff' : theme === 'green' ? '#e6fff2' : '#fff'};
+        color: #{theme === 'dark' ? '#fff' : '#333'};
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .theme-selector {
+        margin-bottom: 20px;
+      }
+      .auth-buttons {
+        margin-top: 20px;
+      }
+      button, select {
+        padding: 8px 16px;
+        margin-right: 10px;
+      }
+  body
+    .container
+      h1= title
+      p Welcome to the Express app with Static Files, Cookies, and JWT!
+      
+      .theme-selector
+        h3 Select Theme
+        select#theme-select
+          option(value="light", selected=theme === 'light') Light
+          option(value="dark", selected=theme === 'dark') Dark
+          option(value="blue", selected=theme === 'blue') Blue
+          option(value="green", selected=theme === 'green') Green
+        button#save-theme Save Theme
+      
+      .auth-buttons
+        button#register-btn Register
+        button#login-btn Login
+        button#logout-btn Logout
+        button#dashboard-btn Go to Dashboard
+
+      script.
+        document.getElementById('save-theme').addEventListener('click', () => {
+          const theme = document.getElementById('theme-select').value;
+          fetch('/theme', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ theme }),
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message);
+            window.location.reload();
+          })
+          .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('register-btn').addEventListener('click', () => {
+          const username = prompt('Enter username:');
+          const password = prompt('Enter password:');
+          
+          fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+          .then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('login-btn').addEventListener('click', () => {
+          const username = prompt('Enter username:');
+          const password = prompt('Enter password:');
+          
+          fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          })
+          .then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          fetch('/auth/logout', {
+            method: 'POST',
+          })
+          .then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('dashboard-btn').addEventListener('click', () => {
+          window.location.href = '/protected/dashboard';
+        }); 

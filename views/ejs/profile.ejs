@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: <%= theme === 'dark' ? '#222' : theme === 'blue' ? '#e6f2ff' : theme === 'green' ? '#e6fff2' : '#fff' %>;
+      color: <%= theme === 'dark' ? '#fff' : '#333' %>;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .profile-card {
+      background-color: <%= theme === 'dark' ? '#333' : '#f0f0f0' %>;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .theme-selector {
+      margin-bottom: 20px;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button, select {
+      padding: 8px 16px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><%= title %></h1>
+    <p>This is your profile page (rendered with EJS)</p>
+    
+    <div class="profile-card">
+      <h3>Profile Information</h3>
+      <p><strong>Username:</strong> <%= user.username %></p>
+      <p><strong>Logged in until:</strong> <span id="expiry-time"></span></p>
+    </div>
+    
+    <div class="theme-selector">
+      <h3>Select Theme</h3>
+      <select id="theme-select">
+        <option value="light" <%= theme === 'light' ? 'selected' : '' %>>Light</option>
+        <option value="dark" <%= theme === 'dark' ? 'selected' : '' %>>Dark</option>
+        <option value="blue" <%= theme === 'blue' ? 'selected' : '' %>>Blue</option>
+        <option value="green" <%= theme === 'green' ? 'selected' : '' %>>Green</option>
+      </select>
+      <button id="save-theme">Save Theme</button>
+    </div>
+    
+    <div class="buttons">
+      <button id="dashboard-btn">Go to Dashboard</button>
+      <button id="home-btn">Back to Home</button>
+      <button id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    // Calculate and display token expiry time
+    try {
+      const jwtCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='));
+      
+      if (jwtCookie) {
+        const token = jwtCookie.split('=')[1];
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const expiryDate = new Date(payload.exp * 1000);
+        document.getElementById('expiry-time').textContent = expiryDate.toLocaleString();
+      } else {
+        document.getElementById('expiry-time').textContent = 'Token not found';
+      }
+    } catch (e) {
+      document.getElementById('expiry-time').textContent = 'Error parsing token';
+    }
+
+    document.getElementById('save-theme').addEventListener('click', () => {
+      const theme = document.getElementById('theme-select').value;
+      fetch('/theme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ theme }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        window.location.reload();
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      fetch('/auth/logout', {
+        method: 'POST',
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        window.location.href = '/';
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('home-btn').addEventListener('click', () => {
+      window.location.href = '/';
+    });
+
+    document.getElementById('dashboard-btn').addEventListener('click', () => {
+      window.location.href = '/protected/dashboard';
+    });
+  </script>
+</body>
+</html> 
